@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Test</title>
+</head>
+<body>
+    <audio id="audio" controls>
+        <!--<source src="" type="video/webm" />-->
+    </audio>
+    <script>
+        let device = navigator.mediaDevices.getUserMedia({ audio: true });
+        let chunks = [];
+        let recorder;
+        device.then(stream => {
+            var options = {
+                audioBitsPerSecond : 48000,
+                numChannels: 1
+                }
+            recorder = new MediaRecorder(stream);
+
+            recorder.ondataavailable = e => {
+                chunks.push(e.data);
+
+                if (recorder.state == 'inactive') {
+                    let blob = new Blob(chunks, { type: 'audio/wav' });
+                    document.getElementById('audio').innerHTML = '<source src="' + URL.createObjectURL(blob) + '" type="audio/wav" />'; //;
+                }
+            }
+
+            recorder.start(1000);
+        });
+
+        setTimeout(() => {
+            recorder.stop()
+        }, 4000);
+    </script>
+</body>
+</html>
